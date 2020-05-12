@@ -1,0 +1,742 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Credit Card</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}"/>
+    <noscript>
+        <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/noscript.css') }}"/>
+    </noscript>
+</head>
+<body class="is-preload">
+<div id="wrapper">
+    <div id="bg"></div>
+    <div id="overlay"></div>
+    <div id="main">
+
+        <!-- Header -->
+        <header id="header">
+            <h1 class="topic_h1">Credit Card Dataset</h1>
+            <p class="topic_h1"></p>
+            <button id='configure_btn' class="btn btn-info btn-lg" type="button" data-toggle="modal"
+                    data-target="#myModal"><span>Configure </span>
+            </button>
+        </header>
+        <!--         Footer-->
+        <footer id="footer">
+            <span class="copyright">&copy; Untitled. Design: <a href="http://html5up.net"></a>.</span>
+        </footer>
+
+    </div>
+</div>
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<script>
+    window.onload = function () {
+        document.body.classList.remove('is-preload');
+    }
+    window.ontouchmove = function () {
+        return false;
+    }
+    window.onorientationchange = function () {
+        document.body.scrollTop = 0;
+    }
+    var lastScreen = 'body';
+
+</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<script src="{{ url_for('static', filename='js/configure_display.js') }}"></script>
+<script src="{{ url_for('static', filename='js/python_connection.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title topic_h4">Configure Dataset</h4>
+            </div>
+            <div class="modal-body">
+                <div id='first' class='first' style="display:block">
+                    <button id='configure_btn1' class="btn btn-info btn-lg"
+                            type="button"
+                            data-target="#original_1" value="Original Data" data-toggle="modal">
+                        <span>Original Data </span>
+                    </button>
+                    <button id='configure_btn2' class="btn btn-info btn-lg"
+                            type="button" data-toggle="modal"
+                            value="Random Sampling Data" data-target="#random_1" data-toggle="modal"><span>Random Sampling Data </span>
+                    </button>
+                    <button id='configure_btn3' class="btn btn-info btn-lg"
+                            type="button" data-toggle="modal"
+                            value="Stratified Sampling Data" data-target="#strat_1" data-toggle="modal">
+                        <span>Stratified Sampling Data</span>
+                    </button>
+                    <button onclick="generate_collectiveScreePlot()" id='configure_btn4' class="btn btn-info btn-lg"
+                            type="button" data-toggle="modal"
+                            value="Collective Scree Plots" data-target="#collective_scree_plot" data-toggle="modal">
+                        <span>Collective Scree Plots</span>
+                    </button>
+
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="orig_1" style="display:none">
+    <p>Hello</p>
+</div>
+
+<div class="modal fade" id="original_1" data-modal-index="2">
+    <div class="modal-dialog" style="width:750px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Original Data Options</h4>
+            </div>
+            <div class="modal-body">
+                <button onclick="original_generatedata()" type="button" id="generate_original" ,
+                        class="btn btn-info btn-lg"
+                        value="Random Data Generation">
+                    <span>Generate Data</span>
+                </button>
+                <p id="successful_dataOriginal" style="display:none">Data Generated</p>
+                <br>
+                <hr>
+                <p id="after_generateOriginal">
+                    <button onclick="display_originalData()" type="button" id="display_original" ,
+                            class="btn btn-info btn-lg"
+                            value="Display Original Data Generation" data-target="#displayOriginalData"
+                            data-toggle="modal">
+                        <span>Display Data</span>
+                    </button>
+                    <button onclick="generate_originalScreePlot()" type="button" id="generate_orig_scree" ,
+                            class="btn btn-info btn-lg"
+                            value="Generate Original Scree Plot" data-target="#scree_plot" data-toggle="modal">
+                        <span>Generate Scree Plot</span>
+                    </button>
+                    <br><br>
+                    <button onclick="orig_top3()" type="button" id="origTop3" ,
+                            class="btn btn-info btn-lg"
+                            value="Show top 3 PCA loadings" data-target="#origTop3DisplayModal" data-toggle="modal">
+                        <span>Show top 3 PCA loadings</span>
+                    </button>
+                    <br><br>
+                    <button onclick="orig_top2PCA()" type="button" id="origTop2PCA" ,
+                            class="btn btn-info btn-lg"
+                            value="Show top 2 PCA Vectors via Scatter Plot" data-target="#originalTop2PCADisplayModal"
+                            data-toggle="modal">
+                        <span>Show top 2 PCA Vectors via Scatter Plot</span>
+                    </button>
+                    <br><br>
+                    <button onclick="orig_MDSEuclidian()" type="button" id="origMDSEuclidian" ,
+                            class="btn btn-info btn-lg"
+                            value="Show MDS Euclidian via Scatter Plots" data-target="#origMDSEuclid"
+                            data-toggle="modal">
+                        <span>Show MDS Euclidian via Scatter Plots</span>
+                    </button>
+                    <br><br>
+                    <button onclick="orig_MDSCorrelation()" type="button" id="origMDSCorrelation" ,
+                            class="btn btn-info btn-lg"
+                            value="Show MDS Correlation via Scatter Plots" data-target="#origMDSCorr"
+                            data-toggle="modal">
+                        <span>Show MDS Correlation via Scatter Plots</span>
+                    </button>
+                    <br><br>
+                    <button onclick="orig_top3Scatter()" type="button" id="origTop3Scatter" ,
+                            class="btn btn-info btn-lg"
+                            value="Show Scatter Plot of top 3 PCA loadings" data-target="#origTop3ScatterDisplayModal"
+                            data-toggle="modal">
+                        <span>Show Scatter Plot of top 3 PCA loadings</span>
+                    </button>
+
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+
+<div class="modal fade" id="random_1" data-modal-index="2">
+    <div class="modal-dialog" style="width:750px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Random Data Options</h4>
+            </div>
+            <div class="modal-body">
+                <button onclick="random_generatedata()" type="button" id="generate_random" , class="btn btn-info btn-lg"
+                        value="Random Data Generation">
+                    <span>Generate Data</span>
+                </button>
+                <p id="successful_data" style="display:none">Data Generated</p>
+                <p id="after_generateRandom" style="display:none">
+                    <button onclick="display_randomData()" type="button" id="display_random" ,
+                            class="btn btn-info btn-lg"
+                            value="Display Random Data Generation" data-target="#displayRandomData" data-toggle="modal">
+                        <span>Display Data</span>
+                    </button>
+                    <button onclick="generate_randomScreePlot()" type="button" id="generate_random_scree" ,
+                            class="btn btn-info btn-lg"
+                            value="Generate Random Scree Plot" data-target="#scree_plot" data-toggle="modal">
+                        <span>Generate Scree Plot</span>
+                    </button>
+                    <br><br>
+                    <button onclick="random_top3()" type="button" id="randomTop3" ,
+                            class="btn btn-info btn-lg"
+                            value="Show top 3 PCA loadings" data-target="#randomTop3DisplayModal" data-toggle="modal">
+                        <span>Show top 3 PCA loadings</span>
+                    </button>
+                    <br><br>
+                    <button onclick="random_top2PCA()" type="button" id="randomTop2PCA" ,
+                            class="btn btn-info btn-lg"
+                            value="Show top 2 PCA Vectors via Scatter Plot" data-target="#randomTop2PCADisplayModal"
+                            data-toggle="modal">
+                        <span>Show top 2 PCA Vectors via Scatter Plot</span>
+                    </button>
+                    <br><br>
+                    <button onclick="random_MDSEuclidian()" type="button" id="randomMDSEuclidian" ,
+                            class="btn btn-info btn-lg"
+                            value="Show MDS Euclidian via Scatter Plots" data-target="#randomMDSEuclid"
+                            data-toggle="modal">
+                        <span>Show MDS Euclidian via Scatter Plots</span>
+                    </button>
+                    <br><br>
+                    <button onclick="random_MDSCorrelation()" type="button" id="randomMDSCorrelation" ,
+                            class="btn btn-info btn-lg"
+                            value="Show MDS Correlation via Scatter Plots" data-target="#randomMDSCorr"
+                            data-toggle="modal">
+                        <span>Show MDS Correlation via Scatter Plots</span>
+                    </button>
+                    <br><br>
+                    <button onclick="random_top3Scatter()" type="button" id="randomTop3Scatter" ,
+                            class="btn btn-info btn-lg"
+                            value="Show Scatter Plot of top 3 PCA loadings" data-target="#randomTop3ScatterDisplayModal"
+                            data-toggle="modal">
+                        <span>Show Scatter Plot of top 3 PCA loadings</span>
+                    </button>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!--<div id="random_1" style="display:none">-->
+
+<!--</div>-->
+
+<div class="modal fade" id="strat_1" data-modal-index="3">
+    <div class="modal-dialog" style="width:750px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Stratified Data Options</h4>
+            </div>
+            <div class="modal-body">
+                <button onclick="strat_generatedata()" type="button" id="generate_strat" ,
+                        class="btn btn-info btn-lg" ,
+                        value="Stratified Data Generation">
+                    <span>Generate Data</span>
+                </button>
+
+
+                <button onclick="strat_findK()" type="button" id="generate_strat_scree1" ,
+                        class="btn btn-info btn-lg"
+                        value="Generate Start Scree Plot" data-target="#scree_plot" data-toggle="modal">
+                    <span>Find K using Clustering</span>
+                </button>
+
+                <br>
+                <br>
+
+                <button onclick="display_stratData()" type="button" id="display_strat" ,
+                        class="btn btn-info btn-lg"
+                        value="Display Stratified Data Generation" ,data-target="#displayStratData"
+                        data-toggle="modal">
+                    <span>Display Data</span>
+                </button>
+                <button onclick="generate_stratScreePlot()" type="button" id="generate_strat_scree" ,
+                        class="btn btn-info btn-lg"
+                        value="Generate Start Scree Plot" data-target="#scree_plot" data-toggle="modal">
+                    <span>Generate Stratified Data Scree Plot</span>
+                </button>
+                <br><br>
+                <button onclick="strat_top3()" type="button" id="stratTop3" ,
+                        class="btn btn-info btn-lg"
+                        value="Show top 3 PCA loadings" data-target="#stratTop3DisplayModal" data-toggle="modal">
+                    <span>Show top 3 PCA loadings</span>
+                </button>
+                <br><br>
+                <button onclick="strat_top2PCA()" type="button" id="stratTop2PCA" ,
+                        class="btn btn-info btn-lg"
+                        value="Show top 2 PCA Vectors via Scatter Plot" data-target="#stratTop2PCADisplayModal"
+                        data-toggle="modal">
+                    <span>Show top 2 PCA Vectors via Scatter Plot</span>
+                </button>
+                <br><br>
+                <button onclick="strat_MDSEuclidian()" type="button" id="stratMDSEuclidian" ,
+                        class="btn btn-info btn-lg"
+                        value="Show MDS Euclidian via Scatter Plots" data-target="#stratMDSEuclid"
+                        data-toggle="modal">
+                    <span>Show MDS Euclidian via Scatter Plots</span>
+                </button>
+                <br><br>
+                <button onclick="strat_MDSCorrelation()" type="button" id="stratMDSCorrelation" ,
+                        class="btn btn-info btn-lg"
+                        value="Show MDS Correlation via Scatter Plots" data-target="#stratMDSCorr"
+                        data-toggle="modal">
+                    <span>Show MDS Correlation via Scatter Plots</span>
+                </button>
+                <br><br>
+                <button onclick="strat_top3Scatter()" type="button" id="stratTop3Scatter" ,
+                        class="btn btn-info btn-lg"
+                        value="Show Scatter Plot of top 3 PCA loadings" data-target="#stratTop3ScatterDisplayModal"
+                        data-toggle="modal">
+                    <span>Show Scatter Plot of top 3 PCA loadings</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+
+<!--<div id="" class="modal fade" >-->
+<div class="modal fade" id="scree_plot" data-modal-index="3">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Scree Plot (Eigen Value vs K)</h4>
+            </div>
+            <div class="modal-body" id='screePlotDetails'>
+                <!--                <p>One fine body&hellip;</p>-->
+                <!--                <button class="btn btn-default" data-toggle="modal" data-target="#test-modal-3">Launch Modal 3</button>-->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!--<div id="" class="modal fade" >-->
+<div class="modal fade" id="kPlotMain" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Scree Plot (Eigen Value vs K)</h4>
+            </div>
+            <div class="modal-body" id='kPlotDetails'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<div class="modal fade" id="collective_scree_plot" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Collective Scree Plots</h4>
+            </div>
+            <div class="modal-body" id='collectiveScreePlotDetails'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+
+<div class="modal fade" id="displayRandomData" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Display of Random Generated Data</h4>
+            </div>
+            <div class="modal-body" id='display_randomDataTable'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="displayStratData" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Display of Stratified Generated Data</h4>
+            </div>
+            <div class="modal-body" id='display_stratDataTable'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="displayOriginalData" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Display of Original Data</h4>
+            </div>
+            <div class="modal-body" id='display_originalDataTable'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="origTop3DisplayModal" data-modal-index="4">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Top 3 Attributes with Highest PCA Loadings </h4>
+            </div>
+            <div class="modal-body" id='top3DisplayOriginal'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="randomTop3DisplayModal" data-modal-index="4">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Top 3 Attributes with Highest PCA Loadings </h4>
+            </div>
+            <div class="modal-body" id='top3DisplayRandom'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="stratTop3DisplayModal" data-modal-index="4">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Top 3 Attributes with Highest PCA Loadings </h4>
+            </div>
+            <div class="modal-body" id='top3DisplayStrat'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+
+<!--## Top 2 PCA Scatter Plot Display-->
+<div class="modal fade" id="originalTop2PCADisplayModal" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Top 2 PCA Scatter Plot Display</h4>
+            </div>
+            <div class="modal-body" id='internal_orig_top2PCA'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+
+<div class="modal fade" id="randomTop2PCADisplayModal" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Top 2 PCA Scatter Plot Display</h4>
+            </div>
+            <div class="modal-body" id='internal_random_top2PCA'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="stratTop2PCADisplayModal" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Top 2 PCA Scatter Plot Display</h4>
+            </div>
+            <div class="modal-body" id='internal_strat_top2PCA'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!--###############################################################-->
+
+
+<!--## Euclidean-->
+<div class="modal fade" id="origMDSEuclid" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">MDS Euclidian Scatter Plo</h4>
+            </div>
+            <div class="modal-body" id='internal_origMDSEuclidian'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="randomMDSEuclid" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">MDS Euclidian Scatter Plo</h4>
+            </div>
+            <div class="modal-body" id='internal_randomMDSEuclidian'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="stratMDSEuclid" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">MDS Euclidian Scatter Plot</h4>
+            </div>
+            <div class="modal-body" id='internal_stratMDSEuclidian'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!--###############################################################-->
+
+
+<!--## Correlation-->
+<div class="modal fade" id="origMDSCorr" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">MDS Correlation Scatter Plot</h4>
+            </div>
+            <div class="modal-body" id='internal_origMDSCorrelation'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="randomMDSCorr" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">MDS Correlation Scatter Plot</h4>
+            </div>
+            <div class="modal-body" id='internal_randomMDSCorrelation'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="stratMDSCorr" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">MDS Correlation Scatter Plot</h4>
+            </div>
+            <div class="modal-body" id='internal_stratMDSCorrelation'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!--###############################################################-->
+
+
+<!--## Scatterplot matrix of the three highest PCA loaded attributes-->
+<div class="modal fade" id="origTop3ScatterDisplayModal" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Scatterplot matrix of the three highest PCA loaded attributes</h4>
+            </div>
+            <div class="modal-body" id='internal_origTop3'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="randomTop3ScatterDisplayModal" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Scatterplot matrix of the three highest PCA loaded attributes</h4>
+            </div>
+            <div class="modal-body" id='internal_randomTop3'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="stratTop3ScatterDisplayModal" data-modal-index="4">
+    <div class="modal-dialog" style="width:1250px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span
+                        class="sr-only">Close</span></button>
+                <h4 class="modal-title">Scatterplot matrix of the three highest PCA loaded attributes</h4>
+            </div>
+            <div class="modal-body" id='internal_stratTop3'>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <!--                <button type="button" class="btn btn-primary">Save changes</button>-->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<!--###############################################################-->
+</div>
+
+</body>
+</html>
